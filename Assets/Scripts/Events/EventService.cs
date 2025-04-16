@@ -8,12 +8,13 @@ using UnityEngine;
 
 namespace ServiceLocator.Events
 {
-    public class EventService : MonoBehaviour
+    public class EventService : GenericMonoSingleton<EventService>
     {
         public GameEventController<int> OnMapSelected { get; private set; }
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             OnMapSelected = new GameEventController<int>();
         }
         
