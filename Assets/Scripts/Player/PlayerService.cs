@@ -7,7 +7,7 @@ using ServiceLocator.Sound;
 
 namespace ServiceLocator.Player
 {
-    public class PlayerService : MonoBehaviour
+    public class PlayerService : GenericMonoSingleton<PlayerService>
     {
 
         [SerializeField] public PlayerScriptableObject playerScriptableObject;
@@ -18,23 +18,6 @@ namespace ServiceLocator.Player
         private MonkeyView selectedMonkeyView;
         private int health;
         public int Money { get; private set; }
-
-        public static PlayerService Instance { get {  return instance; } }
-        
-        private static PlayerService instance;
-
-        private void Awake()
-        {
-            if(instance == null)
-            {
-                instance = this;
-            }
-            else
-            {
-                Destroy(this.gameObject);
-                Debug.LogError("The Player service second instance is created");
-            }
-        }
 
         private void Start()
         {
