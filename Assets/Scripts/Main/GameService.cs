@@ -10,37 +10,31 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GameService : GenericMonoSingleton<GameService>
-{ 
-    public PlayerService playerService {  get; private set; }
+{
+    public PlayerService playerService { get; private set; }
 
     public SoundService soundService { get; private set; }
 
-    public WaveService waveService { get; private set; }
+    [SerializeField] private UIService uiService;
+    public UIService UIService => uiService;
 
     public MapService mapService { get; private set; }
+    public WaveService waveService { get; private set; }
 
     public EventService eventService { get; private set; }
 
-    [SerializeField] private UIService uiService;
-
-    public UIService UIService => uiService;
-
     [SerializeField] private PlayerScriptableObject playerScriptableObject;
-
-    [SerializeField] private WaveScriptableObject waveScriptableObject;
-
-    [SerializeField] private MapScriptableObject mapScriptableObject;
-
-
     [SerializeField] private SoundScriptableObject soundScriptableObject;
+    [SerializeField] private WaveScriptableObject waveScriptableObject;
+    [SerializeField] private MapScriptableObject mapScriptableObject;
     [SerializeField] private AudioSource audioEffects;
     [SerializeField] private AudioSource backgroundMusic;
-
 
 
     private void Start()
     {
         eventService = new EventService();
+        UIService.SubscribeToEvents();
         playerService = new PlayerService(playerScriptableObject);
         soundService = new SoundService(soundScriptableObject, audioEffects, backgroundMusic);
         waveService = new WaveService(waveScriptableObject);
@@ -49,6 +43,10 @@ public class GameService : GenericMonoSingleton<GameService>
 
     private void Update()
     {
-        playerService.Update();
+        if ((playerService != null))
+        {
+            playerService.Update();
+
+        }
     }
 }
