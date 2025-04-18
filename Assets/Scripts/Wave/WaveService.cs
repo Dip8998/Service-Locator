@@ -8,6 +8,8 @@ using ServiceLocator.UI;
 using ServiceLocator.Map;
 using ServiceLocator.Sound;
 using ServiceLocator.Player;
+using ServiceLocator.Utilities;
+using System.Collections;
 
 namespace ServiceLocator.Wave
 {
@@ -20,6 +22,7 @@ namespace ServiceLocator.Wave
         private MapService mapService;
         private SoundService soundService;
         private PlayerService playerService;
+        private CoroutineRunner coroutineRunner;
 
         private int currentWaveId;
         private List<WaveData> waveDatas;
@@ -30,13 +33,14 @@ namespace ServiceLocator.Wave
             this.waveScriptableObject = waveScriptableObject;
         }
 
-        public void Init(EventService eventService, UIService uiService, MapService mapService, SoundService soundService, PlayerService playerService )
+        public void Init(EventService eventService, UIService uiService, MapService mapService, SoundService soundService, PlayerService playerService, CoroutineRunner coroutineRunner )
         {
             this.eventService = eventService;
             this.uiService = uiService;
             this.mapService = mapService;
             this.soundService = soundService;
             this.playerService = playerService;
+            this.coroutineRunner = coroutineRunner;
 
             InitializeBloons();
             SubscribeToEvents();
@@ -65,18 +69,24 @@ namespace ServiceLocator.Wave
             SpawnBloons(bloonsToSpawn, spawnPosition, 0, waveScriptableObject.SpawnRate);
         }
 
-        public async void SpawnBloons(List<BloonType> bloonsToSpawn, Vector3 spawnPosition, int startingWaypointIndex, float spawnRate)
+        public void SpawnBloons(List<BloonType> bloonsToSpawn, Vector3 spawnPosition, int startingWaypointIndex, float spawnRate)
         {
-            foreach(BloonType bloonType in bloonsToSpawn)
+            coroutineRunner.StartCoroutine(SpawnBloonsCoroutine(bloonsToSpawn, spawnPosition, startingWaypointIndex, spawnRate));
+        }
+
+        private IEnumerator SpawnBloonsCoroutine(List<BloonType> bloonsToSpawn, Vector3 spawnPosition, int startingWaypointIndex, float spawnRate)
+        {
+            foreach (BloonType bloonType in bloonsToSpawn)
             {
                 BloonController bloon = bloonPool.GetBloon(bloonType);
                 bloon.SetPosition(spawnPosition);
                 bloon.SetWayPoints(mapService.GetWayPointsForCurrentMap(), startingWaypointIndex);
 
                 AddBloon(bloon);
-                await Task.Delay(Mathf.RoundToInt(spawnRate * 1000));
+                yield return new WaitForSeconds(spawnRate);
             }
         }
+
 
         private void AddBloon(BloonController bloonToAdd)
         {

@@ -21,6 +21,7 @@ namespace ServiceLocator.Main
         [SerializeField] private UIService uiService;
         public UIService UIService => uiService;
 
+        [SerializeField] private CoroutineRunner coroutineRunner;
 
         // Scriptable Objects:
         [SerializeField] private MapScriptableObject mapScriptableObject;
@@ -50,7 +51,7 @@ namespace ServiceLocator.Main
         private void InjectDependency()
         {
             playerService.Init(UIService,mapService,soundService);
-            waveService.Init(eventService, UIService, mapService, soundService, playerService);
+            waveService.Init(eventService, UIService, mapService, soundService, playerService,coroutineRunner);
             mapService.Init(eventService);
             UIService.Init(eventService, waveService,playerService);
         }
